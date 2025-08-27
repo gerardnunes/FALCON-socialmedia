@@ -9,12 +9,10 @@ from functools import wraps
 app = Flask(__name__)
 app.secret_key = 'sua_chave_secreta_aqui'  # Altere para uma chave segura em produção
 
-# Configuração do banco de dados
 DATABASE_URL = os.getenv("DATABASE_URL")
 if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
-# Use PostgreSQL se disponível, senão SQLite local
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL or "sqlite:///falcon_digital.db"
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -769,3 +767,4 @@ if __name__ == '__main__':
     init_db()
 
     app.run(debug=True)
+
