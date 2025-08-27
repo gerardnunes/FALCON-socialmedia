@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Criar Post - Falcon Digital Solutions{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-body p-5">
+                <h2 class="card-title text-center mb-4">Criar Novo Post</h2>
+                <p class="text-center">Projeto: <strong>{{ project.title }}</strong></p>
+                
+                <form method="POST" action="{{ url_for('create_post', project_id=project.id) }}" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Título do Post</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Descrição/Texto</label>
+                        <textarea class="form-control" id="description" name="description" rows="4"></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="platform" class="form-label">Plataforma</label>
+                        <select class="form-select" id="platform" name="platform">
+                            <option value="">Selecione a plataforma</option>
+                            <option value="Instagram">Instagram</option>
+                            <option value="Facebook">Facebook</option>
+                            <option value="Twitter">Twitter</option>
+                            <option value="LinkedIn">LinkedIn</option>
+                            <option value="Outro">Outro</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="media_files" class="form-label">Arquivos (imagens, documentos, etc.)</label>
+                        <input type="file" class="form-control" id="media_files" name="media_files" multiple accept="image/*,.pdf,.doc,.docx,.psd,.ai">
+                        <div class="form-text">Você pode selecionar múltiplos arquivos. Formatos permitidos: imagens, PDF, Word, PSD, AI.</div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Criar Post</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

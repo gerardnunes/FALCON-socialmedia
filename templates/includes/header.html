@@ -1,0 +1,62 @@
+<!-- includes/header.html -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('index') }}">
+            <i class="fas fa-falcon"></i> Falcon Digital Solutions
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('index') }}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('services') }}">Serviços</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('about') }}">Sobre</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('contact') }}">Contato</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav">
+                {% if session.user_id %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user"></i> {{ session.user_name }}
+                    </a>
+                    <ul class="dropdown-menu">
+                        {% if session.user_role == 'client' %}
+                        <!-- No includes/header.html, adicione este item no menu -->
+{% if session.user_id and session.user_role == 'client' %}
+<li class="nav-item">
+    <a class="nav-link" href="#downloads-section">
+        <i class="fas fa-download"></i> Downloads
+    </a>
+</li>
+{% endif %}
+                        <li><a class="dropdown-item" href="{{ url_for('client_dashboard') }}">Dashboard</a></li>
+                        {% elif session.user_role == 'social_media' %}
+                        <li><a class="dropdown-item" href="{{ url_for('social_media_dashboard') }}">Dashboard</a></li>
+                        {% elif session.user_role == 'admin' %}
+                        <li><a class="dropdown-item" href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
+                        {% endif %}
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{{ url_for('logout') }}">Sair</a></li>
+                    </ul>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('register') }}">Registrar</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,116 @@
+<!-- templates/clients.html -->
+{% extends "base.html" %}
+{% block title %}Gerenciar Clientes - Falcon Digital Solutions{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Gerenciar Clientes</h2>
+    <a href="{% if session.user_role == 'social_media' %}{{ url_for('social_media_dashboard') }}{% else %}{{ url_for('admin_dashboard') }}{% endif %}" 
+       class="btn btn-secondary">Voltar ao Dashboard</a>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Todos os Clientes</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Empresa</th>
+                        <th>Telefone</th>
+                        <th>Status</th>
+                        <th>Data de Cadastro</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for client in clients %}
+                    <tr>
+                        <td>{{ client.name }}</td>
+                        <td>{{ client.email }}</td>
+                        <td>{{ client.company }}</td>
+                        <td>{{ client.phone }}</td>
+                        <td>
+                            <span class="badge 
+                                {% if client.status == 'approved' %}bg-success
+                                {% elif client.status == 'rejected' %}bg-danger
+                                {% else %}bg-warning{% endif %}">
+                                {{ client.status|title }}
+                            </span>
+                        </td>
+                        <td>{{ client.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td>
+                            <div class="btn-group">
+                                {% if client.status != 'approved' %}
+                                <form action="{{ url_for('edit_client_status', client_id=client.id) }}" method="POST" class="d-inline">
+                                    <input type="hidden" name="status" value="approved">
+                                    <button type="submit" class="btn btn-sm btn-success" title="Aprovar Cliente">
+                                        <i class="fas fa-check"></i> Aprovar
+                                    </button>
+                                </form>
+                                {% endif %}
+                                
+                                {% if client.status != 'rejected' %}
+                                <form action="{{ url_for('edit_client_status', client_id=client.id) }}" method="POST" class="d-inline">
+                                    <input type="hidden" name="status" value="rejected">
+                                    <button type="submit" class="btn btn-sm btn-danger" title="Rejeitar Cliente">
+                                        <i class="fas fa-times"></i> Rejeitar
+                                    </button>
+                                </form>
+                                {% endif %}
+                                
+                                <button class="btn btn-sm btn-info" title="Editar Cliente" data-bs-toggle="modal" data-bs-target="#editClientModal{{ client.id }}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modais de edição para cada cliente -->
+{% for client in clients %}
+<div class="modal fade" id="editClientModal{{ client.id }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Cliente: {{ client.name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('edit_client', client_id=client.id) }}" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nome</label>
+                        <input type="text" class="form-control" name="name" value="{{ client.name }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email" value="{{ client.email }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Empresa</label>
+                        <input type="text" class="form-control" name="company" value="{{ client.company }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Telefone</label>
+                        <input type="tel" class="form-control" name="phone" value="{{ client.phone }}">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

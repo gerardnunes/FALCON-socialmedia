@@ -1,0 +1,96 @@
+<!-- templates/respond-feedback.html -->
+{% extends "base.html" %}
+{% block title %}Responder Feedback - Falcon Digital Solutions{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-body p-5">
+                <h2 class="card-title text-center mb-4">Responder ao Feedback</h2>
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Feedback Original</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Cliente:</strong> {{ feedback.user.name }}</p>
+                        <p><strong>Status:</strong> 
+                            <span class="badge 
+                                {% if feedback.status == 'approved' %}bg-success
+                                {% elif feedback.status == 'rejected' %}bg-danger
+                                {% elif feedback.status == 'revision' %}bg-warning
+                                {% else %}bg-info{% endif %}">
+                                {{ feedback.status|title }}
+                            </span>
+                        </p>
+                        <p><strong>Comentário:</strong> {{ feedback.comment }}</p>
+                        <p><strong>Data:</strong> {{ feedback.created_at.strftime('%d/%m/%Y %H:%M') }}</p>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Post Original</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Título:</strong> {{ post.title }}</p>
+                        {% if post.description %}
+                        <p><strong>Descrição:</strong> {{ post.description }}</p>
+                        {% endif %}
+                        {% if post.platform %}
+                        <p><strong>Plataforma:</strong> {{ post.platform }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <form method="POST" action="{{ url_for('respond_to_feedback', feedback_id=feedback.id) }}">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Título do Novo Post</label>
+                        <input type="text" class="form-control" id="title" name="title" 
+                               value="{{ suggested_title }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Descrição/Texto do Novo Post</label>
+                        <textarea class="form-control" id="description" name="description" rows="6"></textarea>
+                        <div class="form-text">
+                            Inclua uma descrição detalhada das alterações feitas com base no feedback.
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="copy_media" name="copy_media" checked>
+                            <label class="form-check-label" for="copy_media">
+                                Copiar arquivos do post original
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Criar Novo Post</button>
+                    </div>
+                </form>
+                
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('view_project', project_id=project.id) }}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% if feedback.response_post_id %}
+<div class="mt-2 p-2 bg-light rounded">
+    <strong>Resposta:</strong>
+    <p class="mb-0">{{ feedback.response }}</p>
+    <small class="text-muted">Respondido em: {{ feedback.responded_at.strftime('%d/%m/%Y %H:%M') }}</small>
+    <div class="mt-2">
+        <a href="{{ url_for('view_project', project_id=project.id) }}#post-{{ feedback.response_post_id }}" 
+           class="btn btn-sm btn-outline-primary">
+            <i class="fas fa-external-link-alt"></i> Ver Post de Resposta
+        </a>
+    </div>
+</div>
+{% endif %}

@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+{% block title %}Projeto: {{ project.title }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>{{ project.title }}</h2>
+    <div>
+        <span class="status-badge status-{{ project.status }}">{{ project.status|replace('_', ' ')|title }}</span>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Descrição do Projeto</h5>
+            </div>
+            <div class="card-body">
+                <p>{{ project.description }}</p>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Cliente:</strong> {{ project.client_user.name }}</p>
+                        <p><strong>Social Media:</strong> {{ project.name }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Criado em:</strong> {{ project.created_at.strftime('%d/%m/%Y') }}</p>
+                        {% if project.deadline %}
+                        <p><strong>Prazo:</strong> {{ project.deadline.strftime('%d/%m/%Y') }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Posts</h5>
+                {% if session.user_role == 'social_media' and project.social_media_id == session.user_id %}
+                <a href="{{ url_for('create_post', project_id=project.id) }}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus"></i> Novo Post
+                </a>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if project.posts %}
+                    {% for post in project.posts %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6>{{ post.title }}</h6>
+                                <span class="status-badge status-{{ post.status }}">{{ post.status|title }}</span>
+                            </div>
+                            
+                            {% if post.description %}
+                            <p class="mb-2">{{ post.description }}</p>
+                            {% endif %}
+                            
+                            {% if post.platform %}
+                            <p class="mb-2"><small class="text-muted">Plataforma: {{ post.platform }}</small></p>
+                            {% endif %}
+                            
+                            {% if post.media %}
+                            <div class="mb-3">
+                                <h6 class="mb-2">Arquivos:</h6>
+                                <div class="d-flex flex-wrap gap-2">
+                                    {% for media in post.media %}
+                                    <div class="border rounded p-2">
+                                        {% if media.file_type in ['png', 'jpg', 'jpeg', 'gif'] %}
+                                        <img src="{{ url_for('static', filename='uploads/' + media.filename) }}" 
+                                             alt="{{ media.filename }}" style="max-height: 100px; max-width: 100px;">
+                                        {% else %}
+                                        <i class="fas fa-file fa-2x"></i>
+                                        {% endif %}
+                                        <div class="mt-1">
+                                            <small>{{ media.filename }}</small>
+                                            <div class="mt-1">
+                                                <a href="{{ url_for('download_file', media_id=media.id) }}" 
+                                                   class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-download"></i> Baixar
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if post.feedbacks %}
+                            <div class="mt-3">
+                                <h6>Feedback:</h6>
+                                {% for feedback in post.feedbacks %}
+                                <div class="card mb-2">
+                                    <div class="card-body py-2">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <strong>{{ feedback.user.name }}</strong>
+                                            <span class="status-badge status-{{ feedback.status }}">{{ feedback.status|title }}</span>
+                                        </div>
+                                        <p class="mb-0 mt-1">{{ feedback.comment }}</p>
+                                        <small class="text-muted">{{ feedback.created_at.strftime('%d/%m/%Y %H:%M') }}</small>
+                                        
+                                        {% if session.user_role == 'social_media' and project.social_media_id == session.user_id %}
+                                        <div class="mt-2">
+                                            <a href="{{ url_for('respond_to_feedback', feedback_id=feedback.id) }}" 
+                                               class="btn btn-sm btn-primary">
+                                                Responder Feedback
+                                            </a>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <small class="text-muted">Criado em: {{ post.created_at.strftime('%d/%m/%Y %H:%M') }}</small>
+                                <div>
+                                    {% if session.user_role == 'social_media' and project.social_media_id == session.user_id and post.status == 'draft' %}
+                                    <a href="{{ url_for('submit_post', post_id=post.id) }}" class="btn btn-sm btn-success">
+                                        Enviar para Aprovação
+                                    </a>
+                                    {% endif %}
+                                    
+                                    {% if session.user_role == 'client' and project.client_id == session.user_id and post.status == 'submitted' %}
+                                    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" 
+                                            data-bs-target="#feedbackModal{{ post.id }}">
+                                        Dar Feedback
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if session.user_role == 'client' and project.client_id == session.user_id %}
+                    <div class="modal fade" id="feedbackModal{{ post.id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Feedback para: {{ post.title }}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form action="{{ url_for('add_feedback', post_id=post.id) }}" method="POST">
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label class="form-label">Status</label>
+                                            <select class="form-select" name="status" required>
+                                                <option value="approved">Aprovar</option>
+                                                <option value="rejected">Rejeitar</option>
+                                                <option value="revision">Solicitar Revisão</option>
+                                                <option value="comment">Apenas Comentário</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Comentário</label>
+                                            <textarea class="form-control" name="comment" rows="4" required></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <button type="submit" class="btn btn-primary">Enviar Feedback</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                {% else %}
+                <p class="text-muted text-center py-4">Nenhum post criado ainda.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Informações do Projeto</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>Cliente:</strong><br>
+                    {{ project.client_user.name }}<br>
+                    {{ project.client_user.email }}<br>
+                    {{ project.client_user.phone }}
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Social Media:</strong><br>
+                    {{ project.social_media_user.name }}<br>
+                    {{ project.social_media_user.email }}
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Status:</strong><br>
+                    <span class="status-badge status-{{ project.status }}">{{ project.status|replace('_', ' ')|title }}</span>
+                </div>
+                
+                <div>
+                    <strong>Datas:</strong><br>
+                    Criado: {{ project.created_at.strftime('%d/%m/%Y') }}<br>
+                    Atualizado: {{ project.updated_at.strftime('%d/%m/%Y') }}<br>
+                    {% if project.deadline %}
+                    Prazo: {{ project.deadline.strftime('%d/%m/%Y') }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

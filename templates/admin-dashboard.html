@@ -1,0 +1,133 @@
+<!-- admin-dashboard.html -->
+{% extends "base.html" %}
+{% block title %}Dashboard Admin - Falcon Digital Solutions{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Painel de Administração</h2>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center bg-primary text-white">
+            <div class="card-body">
+                <h5 class="card-title">Total de Usuários</h5>
+                <p class="card-text display-4">{{ users_count }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center bg-success text-white">
+            <div class="card-body">
+                <h5 class="card-title">Projetos Ativos</h5>
+                <p class="card-text display-4">{{ active_projects_count }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center bg-info text-white">
+            <div class="card-body">
+                <h5 class="card-title">Posts Criados</h5>
+                <p class="card-text display-4">{{ posts_count }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center bg-warning text-dark">
+            <div class="card-body">
+                <h5 class="card-title">Clientes Pendentes</h5>
+                <p class="card-text display-4">{{ pending_clients_count }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Últimos Projetos</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_projects %}
+                <div class="list-group">
+                    {% for project in recent_projects %}
+                    <a href="{{ url_for('view_project', project_id=project.id) }}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ project.title }}</h6>
+                            <small>{{ project.created_at.strftime('%d/%m/%Y') }}</small>
+                        </div>
+                        <p class="mb-1">{{ project.description|truncate(100) }}</p>
+                        <small class="text-muted">Cliente: {{ project.client_user.name }}</small>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-center text-muted py-4">Nenhum projeto encontrado.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Estatísticas do Sistema</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between">
+                            <span>Usuários Cadastrados:</span>
+                            <strong>{{ users_count }}</strong>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between">
+                            <span>Projetos em Andamento:</span>
+                            <strong>{{ projects_in_progress_count }}</strong>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between">
+                            <span>Projetos Concluídos:</span>
+                            <strong>{{ completed_projects_count }}</strong>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between">
+                            <span>Total de Arquivos:</span>
+                            <strong>{{ media_files_count }}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="mb-0">Ações de Administração</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <a href="#" class="btn btn-primary w-100">
+                    <i class="fas fa-users"></i> Gerenciar Usuários
+                </a>
+            </div>
+            <div class="col-md-4 mb-3">
+                <a href="#" class="btn btn-success w-100">
+                    <i class="fas fa-chart-bar"></i> Relatórios
+                </a>
+            </div>
+            <div class="col-md-4 mb-3">
+                <a href="#" class="btn btn-info w-100">
+                    <i class="fas fa-cog"></i> Configurações
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

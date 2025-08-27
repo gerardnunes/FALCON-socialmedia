@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}Falcon Digital Solutions - Sua Agência Digital Completa{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section bg-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h1 class="display-4 fw-bold">Sua presença digital com excelência</h1>
+                <p class="lead">Oferecemos soluções completas em design, redes sociais e desenvolvimento web para sua empresa decolar.</p>
+                <div class="mt-4">
+                    {% if not session.user_id %}
+                    <a href="{{ url_for('register') }}" class="btn btn-light btn-lg me-3">Começar Agora</a>
+                    <a href="{{ url_for('contact') }}" class="btn btn-outline-light btn-lg">Fale Conosco</a>
+                    {% else %}
+                    <a href="{% if session.user_role == 'client' %}{{ url_for('client_dashboard') }}{% elif session.user_role == 'social_media' %}{{ url_for('social_media_dashboard') }}{% else %}{{ url_for('admin_dashboard') }}{% endif %}" 
+                       class="btn btn-light btn-lg me-3">Acessar Dashboard</a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-md-6 text-center">
+                <img src="{{ url_for('static', filename='img/falcon2.png') }}" class="img-fluid rounded w-50">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Services Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2>Nossos Serviços</h2>
+            <p class="lead">Oferecemos um ecossistema completo de soluções digitais</p>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                            <i class="fas fa-paint-brush fa-2x text-white"></i>
+                        </div>
+                        <h4>Design Gráfico</h4>
+                        <p>Criação de artes visuais para suas redes sociais, banners, logotipos e identidade visual.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                            <i class="fas fa-hashtag fa-2x text-white"></i>
+                        </div>
+                        <h4>Gestão de Redes Sociais</h4>
+                        <p>Gerenciamento completo das suas redes sociais com conteúdo estratégico e planejado.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                            <i class="fas fa-laptop-code fa-2x text-white"></i>
+                        </div>
+                        <h4>Desenvolvimento Web</h4>
+                        <p>Criação de sites e sistemas web responsivos, modernos e com alta performance.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="{{ url_for('services') }}" class="btn btn-outline-primary">Ver Todos os Serviços</a>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="bg-light py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2>Como Funciona</h2>
+            <p class="lead">Nosso processo de trabalho é simples e eficiente</p>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-3 text-center mb-4">
+                <div class="bg-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3 shadow-sm" style="width: 80px; height: 80px;">
+                    <span class="display-6 text-primary">1</span>
+                </div>
+                <h5>Cadastro e Aprovação</h5>
+                <p>Cliente se cadastra e aguarda aprovação do social media.</p>
+            </div>
+            
+            <div class="col-md-3 text-center mb-4">
+                <div class="bg-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3 shadow-sm" style="width: 80px; height: 80px;">
+                    <span class="display-6 text-primary">2</span>
+                </div>
+                <h5>Criação do Projeto</h5>
+                <p>Social media cria o projeto e adiciona os posts.</p>
+            </div>
+            
+            <div class="col-md-3 text-center mb-4">
+                <div class="bg-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3 shadow-sm" style="width: 80px; height: 80px;">
+                    <span class="display-6 text-primary">3</span>
+                </div>
+                <h5>Revisão e Aprovação</h5>
+                <p>Cliente revisa, comenta e aprova os posts.</p>
+            </div>
+            
+            <div class="col-md-3 text-center mb-4">
+                <div class="bg-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3 shadow-sm" style="width: 80px; height: 80px;">
+                    <span class="display-6 text-primary">4</span>
+                </div>
+                <h5>Publicação</h5>
+                <p>Posts aprovados são publicados nas redes sociais.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="bg-primary text-white py-5">
+    <div class="container text-center">
+        <h2 class="mb-4">Pronto para transformar sua presença digital?</h2>
+        <p class="lead mb-4">Junte-se a empresas que já utilizam nossa plataforma</p>
+        {% if not session.user_id %}
+        <a href="{{ url_for('register') }}" class="btn btn-light btn-lg">Começar Agora</a>
+        {% else %}
+        <a href="{% if session.user_role == 'client' %}{{ url_for('client_dashboard') }}{% elif session.user_role == 'social_media' %}{{ url_for('social_media_dashboard') }}{% else %}{{ url_for('admin_dashboard') }}{% endif %}" 
+           class="btn btn-light btn-lg">Acessar Dashboard</a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    }
+</style>
+{% endblock %}

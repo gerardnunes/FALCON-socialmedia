@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Sobre Nós - Falcon Digital Solutions{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center mb-5">Sobre a Falcon Digital Solutions</h1>
+    
+    <div class="row align-items-center">
+        <div class="col-md-6">
+    <h2>Nossa História</h2>
+    <p>No início de 2025, nasceu a Falcon Digital Solutions, criada após identificarmos uma grande brecha no mercado: muitas empresas não possuíam controle sobre seus posts, nem uma gestão eficiente de seus processos digitais.</p>
+    <p>Com esse propósito, desenvolvemos soluções focadas em controle, administração e estratégias personalizadas, ajudando negócios a alcançarem seu máximo potencial no mundo digital.</p>
+        </div>
+
+        <div class="col-md-6">
+           
+            <img src="{{ url_for('static', filename='img/falcon2.png') }}" alt="Sobre Nós" class="img-fluid rounded">
+
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <h2 class="text-center">Nossa Missão</h2>
+            <p class="text-center">Nossa missão é proporcionar às empresas ferramentas e estratégias digitais inovadoras que impulsionem seu crescimento e as tornem referência em seus segmentos.</p>
+        </div>
+    </div>
+
+{% endblock %}
