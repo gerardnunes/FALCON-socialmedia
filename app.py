@@ -13,7 +13,7 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL or "sqlite:///falcon_digital.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:CikvrUjKImKThLnWAhdUjkdnOJiUQnIn@yamanote.proxy.rlwy.net:14683/railway"
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
@@ -767,4 +767,5 @@ if __name__ == '__main__':
     init_db()
 
     app.run(debug=True)
+
 
