@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash, send_file
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
@@ -7,22 +7,16 @@ from datetime import datetime
 from functools import wraps
 
 app = Flask(__name__)
-app.secret_key = 'sua_chave_secreta_aqui'  # Altere para uma chave segura em produção
 
-DATABASE_URL = os.getenv("DATABASE_URL")
-if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
-
+# Configurações do aplicativo
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:CikvrUjKImKThLnWAhdUjkdnOJiUQnIn@yamanote.proxy.rlwy.net:14683/railway"
-
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
-app.secret_key = os.getenv('SECRET_KEY', 'sua_chave_secreta_super_segura_aqui')
+app.secret_key = 'sua_chave_secreta_super_segura_aqui'  # Altere para uma chave segura em produção
 
 # Extensões permitidas
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'pdf', 'doc', 'docx', 'psd', 'ai'}
-
 
 db = SQLAlchemy(app)
 
@@ -44,8 +38,7 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Modelos de dados corrigidos
-# Modelos de dados corrigidos
+# Modelos de dados
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -118,7 +111,6 @@ class Feedback(db.Model):
     response_post = db.relationship('Post', foreign_keys=[response_post_id])
 
 # Rotas principais
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -277,12 +269,11 @@ def logout():
     return redirect(url_for('index'))
 
 # Painéis de usuário
-# No client_dashboard
 @app.route('/client/dashboard')
 @login_required('client')
 def client_dashboard():
     user = User.query.get(session['user_id'])
-    projects = user.projects_as_client  # Alterado para projects_as_client
+    projects = user.projects_as_client
     
     # Organizar projetos por status
     projects_by_status = {
@@ -297,9 +288,6 @@ def client_dashboard():
                           user=user, 
                           projects=projects,
                           projects_by_status=projects_by_status)
-    # Restante do código...
-
-# No social_media_dashboard
 
 @app.route('/social-media/dashboard')
 @login_required('social_media')
@@ -307,7 +295,7 @@ def social_media_dashboard():
     user = User.query.get(session['user_id'])
     
     # Buscar todos os projetos atribuídos a este social media
-    projects = user.projects_as_social_media  # Alterado para projects_as_social_media
+    projects = user.projects_as_social_media
     
     # Organizar projetos por status
     projects_by_status = {
@@ -369,7 +357,6 @@ def approve_client(client_id):
 
 @app.route('/reject-client/<int:client_id>')
 @login_required('social_media')
-
 def reject_client(client_id):
     client = User.query.get_or_404(client_id)
     if client.role != 'client' or client.status != 'pending':
@@ -423,14 +410,11 @@ def create_project():
     # Buscar clientes aprovados para o formulário
     clients = User.query.filter_by(role='client', status='approved').all()
     return render_template('create-project.html', clients=clients)
-from flask import send_file, abort
-import os
 
 @app.route('/download/<int:media_id>')
 @login_required('client')
 def download_file(media_id):
     try:
-        # Use Session.get (SQLAlchemy 2.0)
         media = db.session.get(Media, media_id)
         if not media:
             flash('Arquivo não encontrado.', 'danger')
@@ -479,6 +463,7 @@ def download_file(media_id):
         print('[download_file] erro:', repr(e))
         flash('Erro ao baixar o arquivo.', 'danger')
         return redirect(url_for('client_dashboard'))
+
 @app.route('/project/<int:project_id>')
 @login_required()
 def view_project(project_id):
@@ -553,8 +538,8 @@ def create_post(project_id):
         return redirect(url_for('view_project', project_id=project_id))
     
     return render_template('create-post.html', project=project)
-# Rota para deletar post (apenas social media dono do projeto)
 
+# Rota para deletar post (apenas social media dono do projeto)
 @app.route('/post/<int:post_id>/delete', methods=['POST'])
 @login_required('social_media')
 def delete_post(post_id):
@@ -590,11 +575,6 @@ def delete_post(post_id):
         app.logger.error(f"Erro ao deletar post: {str(e)}")
     
     return redirect(url_for('view_project', project_id=project.id))
-
-
-# Rota para responder feedback criando novo post
-
-# ... código anterior ...
 
 # Rota para responder feedback criando novo post - CORRIGIDA
 @app.route('/feedback/<int:feedback_id>/respond', methods=['GET', 'POST'])
@@ -666,8 +646,6 @@ def respond_to_feedback(feedback_id):  # Recebe feedback_id, não post_id
                          project=project,
                          suggested_title=suggested_title)
 
-# ... restante do código ...
-
 @app.route('/post/<int:post_id>/submit')
 @login_required('social_media')
 def submit_post(post_id):
@@ -725,7 +703,6 @@ def add_feedback(post_id):
     flash('Feedback enviado com sucesso!', 'success')
     return redirect(url_for('view_project', project_id=project.id))
 
-
 # Inicialização do banco de dados
 def init_db():
     with app.app_context():
@@ -736,7 +713,7 @@ def init_db():
             hashed_password = generate_password_hash('admin123', method='pbkdf2:sha256')
             admin_user = User(
                 name='Administrador',
-                email='add@falcondigital.com',
+                email='admin@falcondigital.com',
                 password=hashed_password,
                 role='admin',
                 status='approved',
@@ -751,7 +728,7 @@ def init_db():
             hashed_password = generate_password_hash('social123', method='pbkdf2:sha256')
             social_user = User(
                 name='Social Media',
-                email='socia@falcondigital.com',
+                email='social@falcondigital.com',
                 password=hashed_password,
                 role='social_media',
                 status='approved',
@@ -763,8 +740,8 @@ def init_db():
 
 if __name__ == '__main__':
     init_db()
-
     app.run(debug=True)
+
 
 
 
