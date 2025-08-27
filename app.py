@@ -14,7 +14,9 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///falcon_digital.db"
+# Use PostgreSQL se disponível, senão SQLite local
+app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL or "sqlite:///falcon_digital.db"
+
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
@@ -765,4 +767,5 @@ def init_db():
 
 if __name__ == '__main__':
     init_db()
+
     app.run(debug=True)
